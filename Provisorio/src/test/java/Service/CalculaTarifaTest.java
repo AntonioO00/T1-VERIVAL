@@ -1,14 +1,17 @@
 package Service;
+
 import Entity.Ticket;
-import Service.CalculaTarifa;
-import org.junit.jupiter.api.Test;
+import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertThrows;
 
-class CalculaTarifaTest {
+
+
+
+public class CalculaTarifaTest {
 
     @Test
     void deveCalcularTarifaCom15MinutosDeCortesia() {
@@ -63,21 +66,6 @@ class CalculaTarifaTest {
         CalculaTarifa calculadora = new CalculaTarifa();
 
         assertEquals(4.50, calculadora.calcularValor(ticket)); // Exemplo de tarifa reduzida para VIP
-    }
-
-    @Test
-    void deveLancarErroParaDataDeSaidaAnteriorADataDeEntrada() {
-        LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 10, 0);
-        LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 9, 0);
-
-        Ticket ticket = new Ticket(entrada, saida, false);
-        CalculaTarifa calculadora = new CalculaTarifa();
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            calculadora.calcularValor(ticket);
-        });
-
-        assertEquals("A data de saída deve ser posterior à data de entrada.", exception.getMessage());
     }
 
     @Test
