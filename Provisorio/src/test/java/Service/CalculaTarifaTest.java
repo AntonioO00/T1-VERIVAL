@@ -4,6 +4,7 @@ import Entity.Ticket;
 import org.testng.annotations.Test;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertThrows;
@@ -11,158 +12,179 @@ import static org.testng.AssertJUnit.assertTrue;
 
 public class CalculaTarifaTest {
 
-    private final CalculaTarifa calculadora = new CalculaTarifa(); // Evita instanciar várias vezes
+    private final CalculoValor calculadora = new CalculoValor();
 
     @Test
-    void calcularTarifaCom15MinutosDeCortesia() {
-        // Testa a situação em que o tempo de permanência é de 15 minutos,
-        // que é a cortesia. O valor da tarifa deve ser 0.0.
+    void deveCalcularTarifaCom15MinutosDeCortesia() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 9, 15);
-
         Ticket ticket = new Ticket(entrada, saida, false);
-
-        assertEquals(0.0, calculadora.calcularValor(ticket));
+        assertEquals(0.0, calculadora.valorTicket(ticket));
     }
 
     @Test
-    void calcularTarifaNormalAteUmaHora() {
-        // Testa a situação em que o tempo de permanência é inferior a uma hora (30 minutos).
-        // O valor da tarifa deve ser o valor base (5.90).
+    void deveCalcularTarifaNormalAteUmaHora() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 9, 30);
-
         Ticket ticket = new Ticket(entrada, saida, false);
-
-        assertEquals(5.90, calculadora.calcularValor(ticket));
+        assertEquals(5.90, calculadora.valorTicket(ticket));
     }
 
     @Test
-    void calcularTarifaParaUmaHora() {
-        // Testa a situação em que o tempo de permanência é exatamente uma hora.
-        // O valor da tarifa deve ser o valor base (5.90).
+    void deveCalcularTarifaParaUmaHora() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 10, 0);
-
         Ticket ticket = new Ticket(entrada, saida, false);
-
-        assertEquals(5.90, calculadora.calcularValor(ticket));
+        assertEquals(5.90, calculadora.valorTicket(ticket));
     }
 
     @Test
-    void calcularTarifaParaPernoite() {
-        // Testa a situação em que o veículo fica estacionado durante a noite.
-        // O valor da tarifa deve ser o valor fixo de pernoite (50.0).
+    void deveCalcularTarifaParaPernoite() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 22, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 8, 9, 0);
-
         Ticket ticket = new Ticket(entrada, saida, false);
-
-        assertEquals(50.0, calculadora.calcularValor(ticket)); // Tarifa pernoite
+        assertEquals(50.0, calculadora.valorTicket(ticket));
     }
 
     @Test
-    void calcularTarifaParaMultiplosDiasPernoite() {
-        // Testa a situação em que o veículo fica estacionado por vários dias.
-        // O valor da tarifa deve ser o total de pernoites multiplicado pelo valor de pernoite (50.0).
+    void deveCalcularTarifaParaMultiplosDiasPernoite() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 22, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 10, 9, 0);
-
         Ticket ticket = new Ticket(entrada, saida, false);
-
-        // 3 pernoites (3 * 50.0)
-        assertEquals(150.0, calculadora.calcularValor(ticket));
+        assertEquals(150.0, calculadora.valorTicket(ticket));
     }
 
     @Test
-    void aplicarDescontoVipParaTarifaNormal() {
-        // Testa a situação em que um cliente VIP utiliza o estacionamento.
-        // O valor da tarifa deve ser calculado normalmente, mas com 50% de desconto.
+    void deveAplicarDescontoVipParaTarifaNormal() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 11, 0);
-
-        Ticket ticket = new Ticket(entrada, saida, true); // Cliente VIP
-
-        // Tarifa total com desconto: (5.90 + 2.50) * 0.5 = 4.20
-        assertEquals(4.20, calculadora.calcularValor(ticket));
+        Ticket ticket = new Ticket(entrada, saida, true);
+        assertEquals(4.20, calculadora.valorTicket(ticket));
     }
 
     @Test
-    void aplicarDescontoVipParaTarifaDePernoite() {
-        // Testa a situação em que um cliente VIP utiliza o estacionamento durante a noite.
-        // O valor da tarifa de pernoite deve ser calculado normalmente, mas com 50% de desconto.
+    void deveAplicarDescontoVipParaTarifaDePernoite() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 22, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 8, 9, 0);
-
-        Ticket ticket = new Ticket(entrada, saida, true); // Cliente VIP
-
-        // Tarifa total com desconto: 50.0 * 0.5 = 25.0
-        assertEquals(25.0, calculadora.calcularValor(ticket));
+        Ticket ticket = new Ticket(entrada, saida, true);
+        assertEquals(25.0, calculadora.valorTicket(ticket));
     }
-
 
     @Test
     void deveCalcularTarifaRapidamente() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 10, 0);
         Ticket ticket = new Ticket(entrada, saida, false);
-        CalculaTarifa calculadora = new CalculaTarifa();
 
         long startTime = System.nanoTime();
-        calculadora.calcularValor(ticket);
+        calculadora.valorTicket(ticket);
         long duration = System.nanoTime() - startTime;
 
-        assertTrue(duration < 1000000); // O tempo deve ser menor que 1ms
-    }
-    @Test
-    void deveLancarExcecaoParaEntradaOuSaidaNulas() {
-        // Testa se uma exceção é lançada quando a entrada ou saída é nula.
-        Ticket ticket1 = new Ticket(null, LocalDateTime.now(), false);
-        Ticket ticket2 = new Ticket(LocalDateTime.now(), null, false);
-        CalculaTarifa calculadora = new CalculaTarifa();
-
-        try {
-            calculadora.calcularValor(ticket1);
-        } catch (IllegalArgumentException e) {
-            assertEquals("Datas de entrada e saída não podem ser nulas.", e.getMessage());
-        }
-
-        try {
-            calculadora.calcularValor(ticket2);
-        } catch (IllegalArgumentException e) {
-            assertEquals("Datas de entrada e saída não podem ser nulas.", e.getMessage());
-        }
-    }
-    @Test
-    void deveLancarExcecaoParaSaidaAntesDaEntrada() {
-        // Testa se uma exceção é lançada quando a saída é anterior à entrada.
-        LocalDateTime entrada = LocalDateTime.now();
-        LocalDateTime saida = entrada.minusHours(1);
-        Ticket ticket = new Ticket(entrada, saida, false);
-        CalculaTarifa calculadora = new CalculaTarifa();
-
-        try {
-            calculadora.calcularValor(ticket);
-        } catch (IllegalArgumentException e) {
-            assertEquals("A data e hora de saída não pode ser anterior à data de entrada.", e.getMessage());
-        }
+        assertTrue(duration < 1000000);
     }
 
     @Test
     void deveCalcularTarifaNosLimites() {
-        // Testa os limites de minutos e horas
-        CalculaTarifa calculadora = new CalculaTarifa();
-
-        // 15 minutos deve ser gratuito
         LocalDateTime entrada = LocalDateTime.now();
         LocalDateTime saida = entrada.plusMinutes(15);
         Ticket ticketLimiteGratuito = new Ticket(entrada, saida, false);
-        assertEquals(0.0, calculadora.calcularValor(ticketLimiteGratuito), 0.01);
+        assertEquals(0.0, calculadora.valorTicket(ticketLimiteGratuito), 0.01);
 
-        // 16 minutos deve cobrar tarifa mínima
         saida = entrada.plusMinutes(16);
         Ticket ticketLimiteMinimo = new Ticket(entrada, saida, false);
-        assertEquals(5.90, calculadora.calcularValor(ticketLimiteMinimo), 0.01);
+        assertEquals(5.90, calculadora.valorTicket(ticketLimiteMinimo), 0.01);
+    }
+
+    @Test
+    void deveLancarExcecaoParaDataEntradaPosteriorSaida() {
+        LocalDateTime entrada = LocalDateTime.of(2024, 10, 8, 12, 0);
+        LocalDateTime saida = LocalDateTime.of(2024, 10, 8, 10, 0);
+        Ticket ticket = new Ticket(entrada, saida, false);
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.valorTicket(ticket);
+        });
+    }
+
+    @Test
+    void deveLancarExcecaoParaTicketNulo() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.valorTicket(null);
+        });
+    }
+
+    @Test
+    void deveLancarExcecaoParaDataEntradaNula() {
+        LocalDateTime saida = LocalDateTime.of(2024, 10, 8, 12, 0);
+        Ticket ticket = new Ticket(null, saida, false);
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.valorTicket(ticket);
+        });
+    }
+
+    @Test
+    void deveLancarExcecaoParaDataSaidaNula() {
+        LocalDateTime entrada = LocalDateTime.of(2024, 10, 8, 12, 0);
+        Ticket ticket = new Ticket(entrada, null, false);
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.valorTicket(ticket);
+        });
+    }
+
+    @Test
+    void deveLancarExcecaoParaDataSaidaAnteriorEntrada() {
+        LocalDateTime entrada = LocalDateTime.of(2024, 10, 8, 12, 0);
+        LocalDateTime saida = LocalDateTime.of(2024, 10, 8, 10, 0);
+        Ticket ticket = new Ticket(entrada, saida, false);
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.valorTicket(ticket);
+        });
+    }
+
+    @Test
+    void deveCalcularTarifaCorretamenteParaDiversasParticoes() {
+        // Período gratuito
+        LocalDateTime entrada1 = LocalDateTime.of(2024, 10, 7, 9, 0);
+        LocalDateTime saida1 = entrada1.plusMinutes(10);
+        Ticket ticket1 = new Ticket(entrada1, saida1, false);
+        assertEquals(0.0, calculadora.valorTicket(ticket1));
+
+        // Tarifa normal
+        LocalDateTime entrada2 = LocalDateTime.of(2024, 10, 7, 9, 0);
+        LocalDateTime saida2 = entrada2.plusMinutes(30);
+        Ticket ticket2 = new Ticket(entrada2, saida2, false);
+        assertEquals(5.90, calculadora.valorTicket(ticket2));
+
+        // Tarifa de pernoite
+        LocalDateTime entrada3 = LocalDateTime.of(2024, 10, 7, 22, 0);
+        LocalDateTime saida3 = entrada3.plusHours(11);
+        Ticket ticket3 = new Ticket(entrada3, saida3, false);
+        assertEquals(50.0, calculadora.valorTicket(ticket3));
+
+        //  Ticket nulo
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.valorTicket(null);
+        });
+
+        //  Data de entrada posterior à data de saída
+        LocalDateTime entrada4 = LocalDateTime.of(2024, 10, 8, 12, 0);
+        LocalDateTime saida4 = LocalDateTime.of(2024, 10, 8, 10, 0);
+        Ticket ticket4 = new Ticket(entrada4, saida4, false);
+        assertThrows(IllegalArgumentException.class, () -> {
+            calculadora.valorTicket(ticket4);
+        });
+    }
+
+    @Test
+    void deveCalcularTarifaComValoresAleatorios() {
+        Random random = new Random();
+        for (int i = 0; i < 10; i++) {
+            LocalDateTime entrada = LocalDateTime.now().minusHours(random.nextInt(24)).minusMinutes(random.nextInt(60));
+            LocalDateTime saida = entrada.plusHours(random.nextInt(24)).plusMinutes(random.nextInt(60));
+            Ticket ticket = new Ticket(entrada, saida, random.nextBoolean());
+
+            double expectedValue = calculadora.valorTicket(ticket);
+            assertEquals(expectedValue, calculadora.valorTicket(ticket), 0.01);
+        }
     }
 
 
