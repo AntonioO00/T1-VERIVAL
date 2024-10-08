@@ -1,5 +1,4 @@
-package Aplication;
-
+package App;
 
 import Entity.Ticket;
 import Service.CalculaTarifa;
@@ -23,30 +22,36 @@ public class Estacionamento {
             int opcao = scanner.nextInt();
             scanner.nextLine(); // Consumir nova linha
 
-            if (opcao == 2) {
-                System.out.println("Encerrando o sistema...");
-                break;
-            }
-
             if (opcao == 1) {
                 Ticket ticket = coletarDadosTicket(scanner);
                 double valor = calculadora.calcularValor(ticket);
-                System.out.printf("Valor a ser pago: R$%.2f%n", valor);
+
+                System.out.printf("\n Valor a ser pago: R$%.2f%n", valor);
             } else {
                 System.out.println("Opção inválida. Tente novamente.");
+            }
+
+            if (opcao == 2) {
+                System.out.println("Encerrando o sistema...");
+                break;
             }
         }
         scanner.close();
     }
 
     private static Ticket coletarDadosTicket(Scanner scanner) {
-        System.out.print("Digite a data e hora de entrada (dd/MM/yyyy HH:mm): ");
-        String entradaStr = scanner.nextLine();
-        LocalDateTime entrada = LocalDateTime.parse(entradaStr, FORMATADOR_DATA_HORA);
-
-        System.out.print("Digite a data e hora de saída (dd/MM/yyyy HH:mm): ");
-        String saidaStr = scanner.nextLine();
-        LocalDateTime saida = LocalDateTime.parse(saidaStr, FORMATADOR_DATA_HORA);
+        System.out.println("-------- DADOS DE ENTRADA ------");
+        System.out.print("Digite a data de entrada (dd/MM/yyyy): ");
+        String dataEntradaStr = scanner.nextLine();
+        System.out.print("Digite a hora de entrada (HH:mm): ");
+        String horaEntradaStr = scanner.nextLine();
+        LocalDateTime entrada = LocalDateTime.parse(dataEntradaStr + " " + horaEntradaStr, FORMATADOR_DATA_HORA);
+        System.out.println("-------- DADOS DE SAÍDA ------");
+        System.out.print("Digite a data de saída (dd/MM/yyyy): ");
+        String dataSaidaStr = scanner.nextLine();
+        System.out.print("Digite a hora de saída (HH:mm): ");
+        String horaSaidaStr = scanner.nextLine();
+        LocalDateTime saida = LocalDateTime.parse(dataSaidaStr + " " + horaSaidaStr, FORMATADOR_DATA_HORA);
 
         System.out.print("O cliente é VIP? (s/n): ");
         boolean clienteVip = scanner.nextLine().equalsIgnoreCase("s");
