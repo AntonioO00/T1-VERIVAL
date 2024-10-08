@@ -15,7 +15,7 @@ public class CalculaTarifaTest {
     private final CalculoValor calculadora = new CalculoValor();
 
     @Test
-    void deveCalcularTarifaCom15MinutosDeCortesia() {
+    void calcularTarifaCom15MinutosDeCortesia() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 9, 15);
         Ticket ticket = new Ticket(entrada, saida, false);
@@ -23,7 +23,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveCalcularTarifaNormalAteUmaHora() {
+    void calcularTarifaNormalAteUmaHora() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 9, 30);
         Ticket ticket = new Ticket(entrada, saida, false);
@@ -31,7 +31,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveCalcularTarifaParaUmaHora() {
+    void calcularTarifaParaUmaHora() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 10, 0);
         Ticket ticket = new Ticket(entrada, saida, false);
@@ -39,7 +39,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveCalcularTarifaParaPernoite() {
+    void calcularTarifaParaPernoite() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 22, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 8, 9, 0);
         Ticket ticket = new Ticket(entrada, saida, false);
@@ -47,7 +47,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveCalcularTarifaParaMultiplosDiasPernoite() {
+    void calcularTarifaParaMultiplosDiasPernoite() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 22, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 10, 9, 0);
         Ticket ticket = new Ticket(entrada, saida, false);
@@ -55,7 +55,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveAplicarDescontoVipParaTarifaNormal() {
+    void aplicarDescontoVipParaTarifaNormal() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 11, 0);
         Ticket ticket = new Ticket(entrada, saida, true);
@@ -63,7 +63,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveAplicarDescontoVipParaTarifaDePernoite() {
+    void aplicarDescontoVipParaTarifaDePernoite() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 22, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 8, 9, 0);
         Ticket ticket = new Ticket(entrada, saida, true);
@@ -71,7 +71,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveCalcularTarifaRapidamente() {
+    void calcularTarifaRapidamente() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 7, 10, 0);
         Ticket ticket = new Ticket(entrada, saida, false);
@@ -84,7 +84,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveCalcularTarifaNosLimites() {
+    void calcularTarifaNosLimites() {
         LocalDateTime entrada = LocalDateTime.now();
         LocalDateTime saida = entrada.plusMinutes(15);
         Ticket ticketLimiteGratuito = new Ticket(entrada, saida, false);
@@ -96,7 +96,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveLancarExcecaoParaDataEntradaPosteriorSaida() {
+    void lancarExcecaoParaDataEntradaPosteriorSaida() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 8, 12, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 8, 10, 0);
         Ticket ticket = new Ticket(entrada, saida, false);
@@ -106,14 +106,14 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveLancarExcecaoParaTicketNulo() {
+    void lancarExcecaoParaTicketNulo() {
         assertThrows(IllegalArgumentException.class, () -> {
             calculadora.valorTicket(null);
         });
     }
 
     @Test
-    void deveLancarExcecaoParaDataEntradaNula() {
+    void lancarExcecaoParaDataEntradaNula() {
         LocalDateTime saida = LocalDateTime.of(2024, 10, 8, 12, 0);
         Ticket ticket = new Ticket(null, saida, false);
         assertThrows(IllegalArgumentException.class, () -> {
@@ -122,7 +122,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveLancarExcecaoParaDataSaidaNula() {
+    void lancarExcecaoParaDataSaidaNula() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 8, 12, 0);
         Ticket ticket = new Ticket(entrada, null, false);
         assertThrows(IllegalArgumentException.class, () -> {
@@ -131,7 +131,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveLancarExcecaoParaDataSaidaAnteriorEntrada() {
+    void lancarExcecaoParaDataSaidaAnteriorEntrada() {
         LocalDateTime entrada = LocalDateTime.of(2024, 10, 8, 12, 0);
         LocalDateTime saida = LocalDateTime.of(2024, 10, 8, 10, 0);
         Ticket ticket = new Ticket(entrada, saida, false);
@@ -141,7 +141,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveCalcularTarifaCorretamenteParaDiversasParticoes() {
+    void calcularTarifaCorretamenteParaDiversasParticoes() {
         // Período gratuito
         LocalDateTime entrada1 = LocalDateTime.of(2024, 10, 7, 9, 0);
         LocalDateTime saida1 = entrada1.plusMinutes(10);
@@ -175,7 +175,7 @@ public class CalculaTarifaTest {
     }
 
     @Test
-    void deveCalcularTarifaComValoresAleatorios() {
+    void calcularTarifaComValoresAleatorios() {
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
             LocalDateTime entrada = LocalDateTime.now().minusHours(random.nextInt(24)).minusMinutes(random.nextInt(60));
